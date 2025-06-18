@@ -1,0 +1,31 @@
+{
+  "name": "theodinproject-blogapi2",
+  "version": "1.0.0",
+  "description": "Express JS API only backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sum4n/TheOdinProject-BlogApi2.git"
+  },
+  "author": "Suman Das",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sum4n/TheOdinProject-BlogApi2/issues"
+  },
+  "homepage": "https://github.com/sum4n/TheOdinProject-BlogApi2#readme",
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "prisma": "^6.10.1"
+  }
+}
