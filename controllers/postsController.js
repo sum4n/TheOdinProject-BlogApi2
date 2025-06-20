@@ -1,6 +1,19 @@
 const prisma = require("../config/prismaClient");
 const asyncHandler = require("express-async-handler");
 
+const { body, validationResult } = require("express-validator");
+
+const validatePost = [
+  body("title")
+    .trim()
+    .isLength({ min: 4, max: 200 })
+    .withMessage("Must be between 4 and 200 characters"),
+  body("content")
+    .trim()
+    .isLength({ min: 10 })
+    .withMessage("Content must be more than 10 characters"),
+];
+
 exports.getAllPosts = asyncHandler(async (req, res) => {
   const posts = await prisma.post.findMany({
     include: {
@@ -33,3 +46,20 @@ exports.getPostById = asyncHandler(async (req, res) => {
 
   res.status(200).json({ post });
 });
+
+exports.createPost = [
+  validatePost,
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array(), input: req.body });
+    }
+
+    const { title, content } = req.body;
+    const post = await prisma.post.create({
+      data: { title, content, authorId: req.user.id },
+    });
+
+    res.status(201).json({ message: "Post created successfully.", post });
+  }),
+];
