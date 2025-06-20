@@ -5,9 +5,11 @@ app.use(express.json());
 
 // Import routes
 const authRouter = require("./routes/auth");
+const postsRouter = require("./routes/posts");
 
 // use Routes
 app.use("/api", authRouter);
+app.use("/api", postsRouter);
 
 // Handle route not found
 app.use((req, res, next) => {

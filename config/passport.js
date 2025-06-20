@@ -15,13 +15,11 @@ passport.use(
         const user = await prisma.user.findUnique({
           where: { email },
         });
-        console.log(user);
         if (!user) {
           return done(null, false, { message: "Incorrect email." });
         }
         // compare hashed password
         const match = await bcrypt.compare(password, user.password);
-        console.log(match);
         if (!match) {
           return done(null, false, { message: "Incrorrect password." });
         }
