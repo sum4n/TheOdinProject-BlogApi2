@@ -63,3 +63,37 @@ exports.createPost = [
     res.status(201).json({ message: "Post created successfully.", post });
   }),
 ];
+
+exports.updatePostById = [
+  validatePost,
+  asyncHandler(async (req, res) => {
+    const postId = Number(req.params.postId);
+    if (isNaN(postId)) {
+      return res.status(400).json({ error: "Invalid post ID" });
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array(), input: req.body });
+    }
+
+    const { title, content } = req.body;
+
+    try {
+      const post = await prisma.post.update({
+        where: { id: postId, authorId: req.user.id },
+        data: { title, content },
+      });
+
+      res
+        .status(200)
+        .json({ message: `Post with ID: ${postId} updated`, post });
+    } catch (err) {
+      if (err.code === "P2025") {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      // give asynchandler the error
+      throw err;
+    }
+  }),
+];
