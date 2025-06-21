@@ -32,4 +32,29 @@ passport.use(
   )
 );
 
+const passportJWT = require("passport-jwt");
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
+
+let opts = {};
+opts.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = process.env.JWT_SECRET_KEY;
+
+passport.use(
+  new JWTStrategy(opts, async (jwtPayload, done) => {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: jwtPayload.id },
+      });
+      if (!user) {
+        return done(null, false);
+      }
+
+      return done(null, user);
+    } catch (err) {
+      return done(err, false);
+    }
+  })
+);
+
 module.exports = passport;
