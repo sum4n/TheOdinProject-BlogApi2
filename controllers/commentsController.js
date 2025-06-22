@@ -128,3 +128,34 @@ exports.updateCommentById = [
     });
   }),
 ];
+
+exports.deleteCommentById = asyncHandler(async (req, res) => {
+  const postId = Number(req.params.postId);
+  const commentId = Number(req.params.commentId);
+
+  if (isNaN(postId)) {
+    return res.status(400).json({ error: "Invalid post ID" });
+  }
+  if (isNaN(commentId)) {
+    return res.status(400).json({ error: "Invalid comment ID" });
+  }
+
+  const comment = await prisma.comment.findFirst({
+    where: { id: commentId, postId },
+  });
+
+  if (!comment) {
+    return res.status(404).json({ error: "Comment not found" });
+  }
+  if (comment.authorId !== req.user.id) {
+    return res.status(403).json({ error: "Not Authorized" });
+  }
+
+  await prisma.comment.delete({
+    where: { id: commentId },
+  });
+
+  res.status(200).json({
+    message: `Comment with ID: ${commentId} deleted`,
+  });
+});
