@@ -8,4 +8,9 @@ router.get(
   commentsController.getAllCommentsByPostId
 );
 
+router.get(
+  "/posts/:postId/comments/:commentId",
+  commentsController.getCommentById
+);
+
 module.exports = router;
