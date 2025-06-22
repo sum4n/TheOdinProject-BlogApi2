@@ -6,10 +6,12 @@ app.use(express.json());
 // Import routes
 const authRouter = require("./routes/auth");
 const postsRouter = require("./routes/posts");
+const commentsRouter = require("./routes/comments");
 
 // use Routes
 app.use("/api", authRouter);
 app.use("/api", postsRouter);
+app.use("/api", commentsRouter);
 
 // Handle route not found
 app.use((req, res, next) => {
