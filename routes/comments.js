@@ -21,4 +21,10 @@ router.post(
   commentsController.createComment
 );
 
+router.put(
+  "/posts/:postId/comments/:commentId",
+  authenticateJWT,
+  commentsController.updateCommentById
+);
+
 module.exports = router;
