@@ -27,4 +27,10 @@ router.put(
   commentsController.updateCommentById
 );
 
+router.delete(
+  "/posts/:postId/comments/:commentId",
+  authenticateJWT,
+  commentsController.deleteCommentById
+);
+
 module.exports = router;
