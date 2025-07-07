@@ -52,7 +52,9 @@ exports.createPost = [
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array(), input: req.body });
+      return res
+        .status(400)
+        .json({ success: false, error: errors.array(), input: req.body });
     }
 
     const { title, content } = req.body;
@@ -60,7 +62,9 @@ exports.createPost = [
       data: { title, content, authorId: req.user.id },
     });
 
-    res.status(201).json({ message: "Post created successfully.", post });
+    res
+      .status(201)
+      .json({ success: true, message: "Post created successfully.", post });
   }),
 ];
 
