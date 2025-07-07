@@ -98,6 +98,39 @@ exports.updatePostById = [
   }),
 ];
 
+exports.updatePostPublishById = asyncHandler(async (req, res) => {
+  const postId = Number(req.params.postId);
+  if (isNaN(postId)) {
+    return res.status(400).json({ success: false, error: "Invalid post ID" });
+  }
+
+  const { published } = req.body;
+  if (typeof published !== "boolean") {
+    return res
+      .status(400)
+      .json({ success: false, error: "`published` must be a boolean" });
+  }
+
+  try {
+    const post = await prisma.post.update({
+      where: { id: postId, authorId: req.user.id },
+      data: { published: published },
+    });
+    res.status(200).json({
+      success: true,
+      message: `Post with ID: ${postId} is published. ${post.published}`,
+    });
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+    // give asynchandler the error
+    throw err;
+  }
+});
+
 exports.deletePostById = asyncHandler(async (req, res) => {
   const postId = Number(req.params.postId);
   if (isNaN(postId)) {
