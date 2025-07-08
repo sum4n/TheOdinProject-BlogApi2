@@ -66,7 +66,36 @@ exports.login = [
         expiresIn: "1d",
       });
 
-      return res.json({ message: "Login successful", token });
+      return res.status(200).json({ message: "Login successful", token });
+    })(req, res, next);
+  },
+];
+
+exports.adminLogin = [
+  validateUser,
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array(), input: req.body });
+    }
+    passport.authenticate("local", { session: false }, (err, user, info) => {
+      if (err || !user) {
+        return res
+          .status(400)
+          .json({ message: "Invalid credentials", user: null });
+      }
+      if (user.role !== "ADMIN") {
+        return res
+          .status(400)
+          .json({ message: "User is not admin", user: null });
+      }
+
+      const payload = { id: user.id };
+      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+        expiresIn: "1d",
+      });
+
+      return res.status(200).json({ message: "Logged in as ADMIN", token });
     })(req, res, next);
   },
 ];
