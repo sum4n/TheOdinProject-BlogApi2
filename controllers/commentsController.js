@@ -20,6 +20,14 @@ exports.getAllCommentsByPostId = asyncHandler(async (req, res) => {
     where: {
       postId: postId,
     },
+    include: {
+      author: {
+        select: {
+          email: true,
+          name: true,
+        },
+      },
+    },
   });
 
   res.status(200).json({ allCommentsByPostId });
