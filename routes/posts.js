@@ -8,7 +8,8 @@ const {
 
 const postsController = require("../controllers/postsController");
 
-router.get("/posts", postsController.getAllPosts);
+router.get("/posts", postsController.getPublishedPosts);
+router.get("/admin/posts", postsController.getAllPosts);
 router.post(
   "/posts",
   authenticateJWT,
@@ -21,6 +22,12 @@ router.put(
   authenticateJWT,
   requireAdmin,
   postsController.updatePostById
+);
+router.put(
+  "/posts/:postId/publish",
+  authenticateJWT,
+  requireAdmin,
+  postsController.updatePostPublishById
 );
 router.delete(
   "/posts/:postId",
