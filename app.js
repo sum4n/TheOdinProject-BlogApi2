@@ -7,11 +7,13 @@ app.use(express.json());
 const authRouter = require("./routes/auth");
 const postsRouter = require("./routes/posts");
 const commentsRouter = require("./routes/comments");
+const userRouter = require("./routes/user");
 
 // use Routes
 app.use("/api", authRouter);
 app.use("/api", postsRouter);
 app.use("/api", commentsRouter);
+app.use("/api", userRouter);
 
 // Handle route not found
 app.use((req, res, next) => {
