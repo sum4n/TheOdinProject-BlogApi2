@@ -14,10 +14,23 @@ const validatePost = [
     .withMessage("Content must be more than 10 characters"),
 ];
 
+exports.getPublishedPosts = asyncHandler(async (req, res) => {
+  const posts = await prisma.post.findMany({
+    where: { published: true },
+    orderBy: { createdAt: "desc" },
+    include: {
+      comments: { orderBy: { createdAt: "asc" } },
+    },
+  });
+
+  res.status(200).json({ posts });
+});
+
 exports.getAllPosts = asyncHandler(async (req, res) => {
   const posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
     include: {
-      comments: true,
+      comments: { orderBy: { createdAt: "asc" } },
     },
   });
 
@@ -73,12 +86,14 @@ exports.updatePostById = [
   asyncHandler(async (req, res) => {
     const postId = Number(req.params.postId);
     if (isNaN(postId)) {
-      return res.status(400).json({ error: "Invalid post ID" });
+      return res.status(400).json({ success: false, error: "Invalid post ID" });
     }
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array(), input: req.body });
+      return res
+        .status(400)
+        .json({ success: false, error: errors.array(), input: req.body });
     }
 
     const { title, content } = req.body;
@@ -89,9 +104,11 @@ exports.updatePostById = [
         data: { title, content },
       });
 
-      res
-        .status(200)
-        .json({ message: `Post with ID: ${postId} updated`, post });
+      res.status(200).json({
+        success: true,
+        message: `Post with ID: ${postId} updated`,
+        post,
+      });
     } catch (err) {
       if (err.code === "P2025") {
         return res.status(404).json({ error: "Post not found" });
