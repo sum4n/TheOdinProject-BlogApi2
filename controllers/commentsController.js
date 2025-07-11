@@ -155,15 +155,17 @@ exports.deleteCommentById = asyncHandler(async (req, res) => {
   if (!comment) {
     return res.status(404).json({ error: "Comment not found" });
   }
-  if (comment.authorId !== req.user.id) {
-    return res.status(403).json({ error: "Not Authorized" });
+
+  // if (comment author is not user)true and (the user is not ADMIN)true the show 'Not Authorized'""
+  if (comment.authorId !== req.user.id && req.user.role !== "ADMIN") {
+    return res.status(403).json({ success: false, error: "Not Authorized" });
   }
 
   await prisma.comment.delete({
     where: { id: commentId },
   });
 
-  res.status(200).json({
-    message: `Comment with ID: ${commentId} deleted`,
-  });
+  res
+    .status(200)
+    .json({ success: true, message: `Comment with ID: ${commentId} deleted` });
 });
