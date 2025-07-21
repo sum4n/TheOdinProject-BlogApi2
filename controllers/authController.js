@@ -42,7 +42,10 @@ exports.signup = [
       },
     });
 
-    res.status(201).json({ message: "User created.", user: user });
+    // Sanitize user, remove the password with JS Object Destructuring
+    const { password: dbPassword, ...safeUser } = user;
+
+    res.status(201).json({ message: "User created.", user: safeUser });
   }),
 ];
 
