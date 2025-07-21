@@ -29,8 +29,9 @@ exports.signup = [
     });
 
     if (existingUser) {
-      res.status(400);
-      throw new Error(`User with email: ${email} already exists.`);
+      res
+        .status(400)
+        .json({ message: `User with email: ${email} already exists.` });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -59,9 +60,10 @@ exports.login = [
 
     passport.authenticate("local", { session: false }, (err, user, info) => {
       if (err || !user) {
-        return res
-          .status(400)
-          .json({ message: "Invalid credentials", user: null });
+        return res.status(400).json({
+          message: info?.message || "Invalid credentials",
+          user: null,
+        });
       }
 
       const payload = { id: user.id };
@@ -81,11 +83,13 @@ exports.adminLogin = [
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array(), input: req.body });
     }
+
     passport.authenticate("local", { session: false }, (err, user, info) => {
       if (err || !user) {
-        return res
-          .status(400)
-          .json({ message: "Invalid credentials", user: null });
+        return res.status(400).json({
+          message: info?.message || "Invalid credentials",
+          user: null,
+        });
       }
       if (user.role !== "ADMIN") {
         return res
