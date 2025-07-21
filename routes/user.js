@@ -3,14 +3,8 @@ const router = Router();
 
 const { authenticateJWT } = require("../middlewares/jwtAuthMiddleware");
 
-router.get("/user/", authenticateJWT, async (req, res) => {
-  const user = req.user;
+const userController = require("../controllers/userController");
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  res.status(200).json({ user });
-});
+router.get("/user/", authenticateJWT, userController.getUser);
 
 module.exports = router;
