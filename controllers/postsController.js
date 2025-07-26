@@ -18,9 +18,6 @@ exports.getPublishedPosts = asyncHandler(async (req, res) => {
   const posts = await prisma.post.findMany({
     where: { published: true },
     orderBy: { createdAt: "desc" },
-    include: {
-      comments: { orderBy: { createdAt: "asc" } },
-    },
   });
 
   res.status(200).json({ posts });
@@ -29,28 +26,26 @@ exports.getPublishedPosts = asyncHandler(async (req, res) => {
 exports.getAllPosts = asyncHandler(async (req, res) => {
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
-    include: {
-      comments: { orderBy: { createdAt: "asc" } },
-    },
   });
 
   res.status(200).json({ posts });
 });
 
-exports.getPostById = asyncHandler(async (req, res) => {
+function parsePostId(req) {
   const postId = Number(req.params.postId);
   if (isNaN(postId)) {
-    return res.status(400).json({ error: "Invalid post ID" });
+    const err = new Error("Invalid ID");
+    err.status = 400;
+    throw err; // Let asyncHandler catch this
   }
+  return postId;
+}
+
+exports.getPostById = asyncHandler(async (req, res) => {
+  const postId = parsePostId(req);
 
   const post = await prisma.post.findUnique({
     where: { id: postId },
-    include: {
-      author: {
-        select: { id: true, name: true, email: true },
-      },
-      comments: true,
-    },
   });
 
   if (!post) {
@@ -84,10 +79,7 @@ exports.createPost = [
 exports.updatePostById = [
   validatePost,
   asyncHandler(async (req, res) => {
-    const postId = Number(req.params.postId);
-    if (isNaN(postId)) {
-      return res.status(400).json({ success: false, error: "Invalid post ID" });
-    }
+    const postId = parsePostId(req);
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -120,10 +112,7 @@ exports.updatePostById = [
 ];
 
 exports.updatePostPublishById = asyncHandler(async (req, res) => {
-  const postId = Number(req.params.postId);
-  if (isNaN(postId)) {
-    return res.status(400).json({ success: false, error: "Invalid post ID" });
-  }
+  const postId = parsePostId(req);
 
   const { published } = req.body;
   if (typeof published !== "boolean") {
@@ -153,10 +142,7 @@ exports.updatePostPublishById = asyncHandler(async (req, res) => {
 });
 
 exports.deletePostById = asyncHandler(async (req, res) => {
-  const postId = Number(req.params.postId);
-  if (isNaN(postId)) {
-    return res.status(400).json({ error: "Invalid post ID" });
-  }
+  const postId = parsePostId(req);
 
   try {
     await prisma.post.delete({
