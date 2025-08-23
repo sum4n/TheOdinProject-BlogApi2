@@ -1,5 +1,14 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+
+const corsOptions = cors({
+  origin: "https://blogapi-userfrontend.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+});
+
+app.use(corsOptions);
 
 app.use(express.json());
 
